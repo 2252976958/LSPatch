@@ -88,8 +88,11 @@ public class LSPatch {
     @Parameter(names = {"--manager"}, description = "Use manager (Cannot work with embedding modules)")
     private boolean useManager = false;
 
-    @Parameter(names = {"-r", "--allowdown"}, description = "Allow downgrade installation by overriding versionCode to 1 (In most cases, the app can still get the correct versionCode)")
-    private boolean overrideVersionCode = false;
+    @Parameter(names = {"-vc", "--versioncode"}, description = "overriding versionCode to any (In most cases, the app can still get the correct versionCode)")
+    private int overrideVersionCode = 0;
+
+    @Parameter(names = {"-vn", "--versionname"}, description = "overriding versionName to any (In most cases, the app can still get the correct versionName)")
+    private String overrideVersionName = "";
 
     @Parameter(names = {"-v", "--verbose"}, description = "Verbose output")
     private boolean verbose = false;
@@ -355,8 +358,12 @@ public class LSPatch {
     private byte[] modifyManifestFile(InputStream is, String metadata) throws IOException {
         ModificationProperty property = new ModificationProperty();
 
-        if (overrideVersionCode)
-            property.addManifestAttribute(new AttributeItem(NodeValue.Manifest.VERSION_CODE, 1));
+        if (overrideVersionCode != 0)
+            property.addManifestAttribute(new AttributeItem(NodeValue.Manifest.VERSION_CODE, overrideVersionCode));
+
+        if (overrideVersionName != "")
+            property.addManifestAttribute(new AttributeItem(NodeValue.Manifest.VERSION_NAME, overrideVersionName));
+
         property.addApplicationAttribute(new AttributeItem(NodeValue.Application.DEBUGGABLE, debuggableFlag));
         property.addApplicationAttribute(new AttributeItem("appComponentFactory", PROXY_APP_COMPONENT_FACTORY));
         property.addMetaData(new ModificationProperty.MetaData("lspatch", metadata));
